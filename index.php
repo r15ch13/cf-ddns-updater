@@ -35,7 +35,7 @@ if (empty($email) || empty($key)) {
 if (empty($email) || empty($key) || empty($zone) || empty($domain)) {
   echo '<pre>';
   echo 'Usage:' . PHP_EOL . PHP_EOL;
-  echo 'curl \'http://ddns.example.org/?zone=example.org&domain=home.example.org&wildcard=true\' \\' . PHP_EOL;
+  echo 'curl \'https://ddns.example.org/?zone=example.org&domain=home.example.org&wildcard=true\' \\' . PHP_EOL;
   echo '  -H \'X-Auth-Email: &lt;cloudflare email&gt;\' \\' . PHP_EOL;
   echo '  -H \'X-Auth-Key: &lt;cloudflare key&gt;' . PHP_EOL . PHP_EOL;
   echo 'zone = Cloudflare Zone' . PHP_EOL;
