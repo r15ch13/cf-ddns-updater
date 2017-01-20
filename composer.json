@@ -1,0 +1,6 @@
+{
+    "require": {
+        "jamesryanbell/cloudflare": "^1.8",
+        "illuminate/http": "^5.3"
+    }
+}
