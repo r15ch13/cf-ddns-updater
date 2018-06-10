@@ -1,6 +1,7 @@
 <?php
 require 'vendor/autoload.php';
 use Illuminate\Http\Request;
+header('Content-Type: text/plain');
 
 function updateOrCreate($dns, $zone_identifier, $record, $type, $name, $content)
 {
