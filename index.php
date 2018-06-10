@@ -55,23 +55,27 @@ $zone = reset($zones->zones($zone)->result);
 $dns = new Cloudflare\Zone\Dns($client);
 
 $record = reset($dns->list_records($zone->id, 'A', $domain)->result);
-updateOrCreate($dns, $zone->id, $record, 'A', $domain, $ipv4);
+$result = updateOrCreate($dns, $zone->id, $record, 'A', $domain, $ipv4);
 echo "Updated $domain to $ipv4" . PHP_EOL;
+if(!$result->success) { print_r($result->errors); }
 
 if ($request->has('wildcard')) {
   $wildcard = reset($dns->list_records($zone->id, 'A', '*.' . $domain)->result);
-  updateOrCreate($dns, $zone->id, $wildcard, 'A', '*.' . $domain, $ipv4);
+  $result = updateOrCreate($dns, $zone->id, $wildcard, 'A', '*.' . $domain, $ipv4);
   echo "Updated *.$domain to $ipv4";
+  if(!$result->success) { print_r($result->errors); }
 }
 
 if ($ipv6) {
   $record = reset($dns->list_records($zone->id, 'AAAA', $domain)->result);
-  updateOrCreate($dns, $zone->id, $record, 'AAAA', $domain, $ipv6);
+  $result = updateOrCreate($dns, $zone->id, $record, 'AAAA', $domain, $ipv6);
   echo "Updated $domain to $ipv6" . PHP_EOL;
+  if(!$result->success) { print_r($result->errors); }
 
   if ($request->has('wildcard')) {
     $wildcard = reset($dns->list_records($zone->id, 'AAAA', '*.' . $domain)->result);
-    updateOrCreate($dns, $zone->id, $wildcard, 'AAAA', '*.' . $domain, $ipv6);
+    $result = updateOrCreate($dns, $zone->id, $wildcard, 'AAAA', '*.' . $domain, $ipv6);
     echo "Updated *.$domain to $ipv6";
+    if(!$result->success) { print_r($result->errors); }
   }
 }
