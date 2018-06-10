@@ -35,7 +35,7 @@ if (empty($email) || empty($key)) {
 if (empty($email) || empty($key) || empty($zone) || empty($domain)) {
   echo '<pre>';
   echo 'Usage:' . PHP_EOL . PHP_EOL;
-  echo 'curl \'https://ddns.example.org/?zone=example.org&domain=home.example.org&wildcard=true\' \\' . PHP_EOL;
+  echo 'curl \'https://ddns.example.org/?zone=ZONE_ID&domain=home.example.org&wildcard=true\' \\' . PHP_EOL;
   echo '  -H \'X-Auth-Email: &lt;cloudflare email&gt;\' \\' . PHP_EOL;
   echo '  -H \'X-Auth-Key: &lt;cloudflare key&gt;' . PHP_EOL . PHP_EOL;
   echo 'zone = Cloudflare Zone' . PHP_EOL;
@@ -43,7 +43,8 @@ if (empty($email) || empty($key) || empty($zone) || empty($domain)) {
   echo 'wildcard = Use *.example.org' . PHP_EOL;
   echo 'ip|ipv4 = Update ipv4 (no auto detection)' . PHP_EOL;
   echo 'ipv6 = Update ipv6' . PHP_EOL . PHP_EOL;
-  echo 'The username and password field of your Fritz!Box settings will be used.';
+  echo 'The username and password field of your Fritz!Box settings will be used.' . PHP_EOL . PHP_EOL;
+  echo 'FRITZ!Box Example: https://ddns.example.org/?zone=ZONE_ID&domain=&lt;domain&gt;&ipv4=&lt;ipaddr&gt;&ipv6=&lt;ip6addr&gt;';
   echo '</pre>';
   return;
 }
