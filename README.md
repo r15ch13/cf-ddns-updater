@@ -16,9 +16,11 @@ Mini Dynamic DNS Service using Cloudflare
 
 - `zone` = Cloudflare Zone Name (not the ID)
 - `domain` = Domain or Subdomain
-- `wildcard` = Use *.example.org
 - `ip|ipv4` = Update ipv4 (no auto detection)
 - `ipv6` = Update ipv6
+- `ttl` = Update TTL value (default: 120)
+- `wildcard` = Use *.example.org (flag)
+- `proxied` = Set proxy status (flag)
 
 The username and password field of your FRITZ!Box settings will be used.
 
