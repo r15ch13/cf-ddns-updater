@@ -1,6 +1,6 @@
 {
     "require": {
-        "jamesryanbell/cloudflare": "^1.8",
-        "illuminate/http": "^5.3"
+        "symfony/http-foundation": "^5.0",
+        "cloudflare/sdk": "^1.1"
     }
 }
