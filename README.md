@@ -9,7 +9,7 @@ Mini Dynamic DNS Service using Cloudflare
 
 ## Usage
 ```
-λ curl 'https://ddns.example.org/?zone=example.org&domain=home.example.org&wildcard=true' \
+λ curl 'https://ddns.example.org/?zone=example.org&domain=home.example.org&wildcard' \
   -H 'X-Auth-Email: <cloudflare email>' \
   -H 'X-Auth-Key: <cloudflare key>
 ```

@@ -43,7 +43,7 @@ if (empty($email) || empty($key)) {
 if (empty($email) || empty($key) || empty($zone) || empty($domain)) {
   $host = htmlentities($request->getHttpHost());
   echo "Usage:\n\n";
-  echo "curl 'https://$host/?zone=example.org&domain=home.example.org&wildcard=true' \\\n";
+  echo "curl 'https://$host/?zone=example.org&domain=home.example.org&wildcard' \\\n";
   echo "  -H 'X-Auth-Email: <cloudflare email> \\\n";
   echo "  -H 'X-Auth-Key: <cloudflare key>\n\n";
   echo "zone = Cloudflare Zone Name (not the ID)\n";
