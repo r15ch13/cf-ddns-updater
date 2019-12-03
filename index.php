@@ -1,40 +1,44 @@
 <?php
-require 'vendor/autoload.php';
-use Illuminate\Http\Request;
+require __DIR__ . '/vendor/autoload.php';
+use \Symfony\Component\HttpFoundation\Request;
+use \Cloudflare\API\Auth\APIKey as CloudflareAPIKey;
+use \Cloudflare\API\Adapter\Guzzle as CloudflareAdapter;
+use \Cloudflare\API\Endpoints\Zones as CloudflareZones;
+use \Cloudflare\API\Endpoints\DNS as CloudflareDNS;
 header('Content-Type: text/plain');
 
-function updateOrCreate($dns, $zone_identifier, $record, $type, $name, $content)
+function updateOrCreate(CloudflareDNS $dns, string $zoneID, $record, string $type, string $name, string $content)
 {
   if (!empty($record)) {
-    return $dns->update($zone_identifier, $record->id, $type, $name, $content, 120);
+    return $dns->updateRecordDetails($zoneID, $record->id, ['type' => $type, 'name' => $name, 'content' => $content, 'ttl' => 120]);
   } else {
-    return $dns->create($zone_identifier, $type, $name, $content, 120);
+    return $dns->addRecord($zoneID, $type, $name, $content, 120, false);
   }
 }
 
-$request = Request::capture();
+$request = Request::createFromGlobals();
 
-$email = $request->get('email');
-$key = $request->get('key');
-$zone = $request->get('zone');
-$domain = $request->get('domain');
-$ipv4 = $request->get('ipv4', $request->get('ip', $request->ip()));
-$ipv6 = $request->get('ipv6');
+$email = (string)$request->get('email');
+$key = (string)$request->get('key');
+$zone = (string)$request->get('zone');
+$domain = (string)$request->get('domain');
+$ipv4 = (string)$request->get('ipv4', (string)$request->get('ip', (string)$request->getClientIp()));
+$ipv6 = (string)$request->get('ipv6');
 
 // Cloudflare API Headers
 if (empty($email) || empty($key)) {
-  $email = $request->headers->get('x-auth-email');
-  $key = $request->headers->get('x-auth-key');
+  $email = (string)$request->headers->get('x-auth-email');
+  $key = (string)$request->headers->get('x-auth-key');
 }
 
 // FRITZ!Box Auth Fields
 if (empty($email) || empty($key)) {
-  $email = $request->headers->get('php_auth_user');
-  $key = $request->headers->get('php_auth_pw');
+  $email = (string)$request->headers->get('php_auth_user');
+  $key = (string)$request->headers->get('php_auth_pw');
 }
 
 if (empty($email) || empty($key) || empty($zone) || empty($domain)) {
-  $host = htmlentities($_SERVER['HTTP_HOST']);
+  $host = htmlentities($request->getHttpHost());
   echo "Usage:\n\n";
   echo "curl 'https://$host/?zone=example.org&domain=home.example.org&wildcard=true' \\\n";
   echo "  -H 'X-Auth-Email: <cloudflare email> \\\n";
@@ -49,33 +53,34 @@ if (empty($email) || empty($key) || empty($zone) || empty($domain)) {
   return;
 }
 
-$client = new Cloudflare\Api($email, $key);
-$zones = new Cloudflare\Zone($client);
-$zone = reset($zones->zones($zone)->result);
-$dns = new Cloudflare\Zone\Dns($client);
+$key = new CloudflareAPIKey($email, $key);
+$adapter = new CloudflareAdapter($key);
+$zones = new CloudflareZones($adapter);
+$dns = new CloudflareDNS($adapter);
+$zoneID = $zones->getZoneID($zone);
 
-$record = reset($dns->list_records($zone->id, 'A', $domain)->result);
-$result = updateOrCreate($dns, $zone->id, $record, 'A', $domain, $ipv4);
+$record = reset($dns->listRecords($zoneID, 'A', $domain)->result);
+$result = updateOrCreate($dns, $zoneID, $record, 'A', $domain, $ipv4);
 echo "Updated $domain to $ipv4" . PHP_EOL;
-if(!$result->success) { print_r($result->errors); }
+if(!$result) { print_r($result); }
 
-if ($request->has('wildcard')) {
-  $wildcard = reset($dns->list_records($zone->id, 'A', '*.' . $domain)->result);
-  $result = updateOrCreate($dns, $zone->id, $wildcard, 'A', '*.' . $domain, $ipv4);
+if (!is_null($request->get('wildcard'))) {
+  $wildcard = reset($dns->listRecords($zoneID, 'A', '*.' . $domain)->result);
+  $result = updateOrCreate($dns, $zoneID, $wildcard, 'A', '*.' . $domain, $ipv4);
   echo "Updated *.$domain to $ipv4";
-  if(!$result->success) { print_r($result->errors); }
+  if(!$result) { print_r($result); }
 }
 
 if ($ipv6) {
-  $record = reset($dns->list_records($zone->id, 'AAAA', $domain)->result);
-  $result = updateOrCreate($dns, $zone->id, $record, 'AAAA', $domain, $ipv6);
+  $record = reset($dns->listRecords($zoneID, 'AAAA', $domain)->result);
+  $result = updateOrCreate($dns, $zoneID, $record, 'AAAA', $domain, $ipv6);
   echo "Updated $domain to $ipv6" . PHP_EOL;
-  if(!$result->success) { print_r($result->errors); }
+  if(!$result) { print_r($result); }
 
-  if ($request->has('wildcard')) {
-    $wildcard = reset($dns->list_records($zone->id, 'AAAA', '*.' . $domain)->result);
-    $result = updateOrCreate($dns, $zone->id, $wildcard, 'AAAA', '*.' . $domain, $ipv6);
+  if (!is_null($request->get('wildcard'))) {
+    $wildcard = reset($dns->listRecords($zoneID, 'AAAA', '*.' . $domain)->result);
+    $result = updateOrCreate($dns, $zoneID, $wildcard, 'AAAA', '*.' . $domain, $ipv6);
     echo "Updated *.$domain to $ipv6";
-    if(!$result->success) { print_r($result->errors); }
+    if(!$result) { print_r($result); }
   }
 }
