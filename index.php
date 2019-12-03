@@ -25,7 +25,8 @@ $domain = (string)$request->get('domain');
 $ipv4 = (string)$request->get('ipv4', (string)$request->get('ip', (string)$request->getClientIp()));
 $ipv6 = (string)$request->get('ipv6');
 $ttl = (int)$request->get('ttl', 120);
-$proxied = !is_null($request->get('proxied'));
+$isProxied = !is_null($request->get('proxied'));
+$isWildcard = !is_null($request->get('wildcard'));
 
 // Cloudflare API Headers
 if (empty($email) || empty($key)) {
@@ -64,26 +65,26 @@ $dns = new CloudflareDNS($adapter);
 $zoneID = $zones->getZoneID($zone);
 
 $record = reset($dns->listRecords($zoneID, 'A', $domain)->result);
-$result = updateOrCreate($dns, $zoneID, $record, 'A', $domain, $ipv4, $ttl, $proxied);
+$result = updateOrCreate($dns, $zoneID, $record, 'A', $domain, $ipv4, $ttl, $isProxied);
 echo "Updated $domain to $ipv4" . PHP_EOL;
 if(!$result) { print_r($result); }
 
-if (!is_null($request->get('wildcard'))) {
+if ($isWildcard) {
   $wildcard = reset($dns->listRecords($zoneID, 'A', '*.' . $domain)->result);
-  $result = updateOrCreate($dns, $zoneID, $wildcard, 'A', '*.' . $domain, $ipv4, $ttl, $proxied);
+  $result = updateOrCreate($dns, $zoneID, $wildcard, 'A', '*.' . $domain, $ipv4, $ttl, $isProxied);
   echo "Updated *.$domain to $ipv4";
   if(!$result) { print_r($result); }
 }
 
 if ($ipv6) {
   $record = reset($dns->listRecords($zoneID, 'AAAA', $domain)->result);
-  $result = updateOrCreate($dns, $zoneID, $record, 'AAAA', $domain, $ipv6, $ttl, $proxied);
+  $result = updateOrCreate($dns, $zoneID, $record, 'AAAA', $domain, $ipv6, $ttl, $isProxied);
   echo "Updated $domain to $ipv6" . PHP_EOL;
   if(!$result) { print_r($result); }
 
-  if (!is_null($request->get('wildcard'))) {
+  if ($isWildcard) {
     $wildcard = reset($dns->listRecords($zoneID, 'AAAA', '*.' . $domain)->result);
-    $result = updateOrCreate($dns, $zoneID, $wildcard, 'AAAA', '*.' . $domain, $ipv6, $ttl, $proxied);
+    $result = updateOrCreate($dns, $zoneID, $wildcard, 'AAAA', '*.' . $domain, $ipv6, $ttl, $isProxied);
     echo "Updated *.$domain to $ipv6";
     if(!$result) { print_r($result); }
   }
