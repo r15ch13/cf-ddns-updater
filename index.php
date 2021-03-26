@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
 use \Symfony\Component\HttpFoundation\Request;
-use \Cloudflare\API\Auth\APIKey as CloudflareAPIKey;
+use \Cloudflare\API\Auth\APIToken as CloudflareAPIToken;
 use \Cloudflare\API\Adapter\Guzzle as CloudflareAdapter;
 use \Cloudflare\API\Endpoints\Zones as CloudflareZones;
 use \Cloudflare\API\Endpoints\DNS as CloudflareDNS;
@@ -45,7 +45,7 @@ if (empty($email) || empty($key) || empty($zone) || empty($domain)) {
   echo "Usage:\n\n";
   echo "curl 'https://$host/?zone=example.org&domain=home.example.org&wildcard' \\\n";
   echo "  -H 'X-Auth-Email: <cloudflare email> \\\n";
-  echo "  -H 'X-Auth-Key: <cloudflare key>\n\n";
+  echo "  -H 'X-Auth-Key: <cloudflare token>\n\n";
   echo "zone = Cloudflare Zone Name (not the ID)\n";
   echo "domain = Domain or Subdomain\n";
   echo "ip|ipv4 = Update ipv4 (no auto detection)\n";
@@ -58,7 +58,7 @@ if (empty($email) || empty($key) || empty($zone) || empty($domain)) {
   return;
 }
 
-$key = new CloudflareAPIKey($email, $key);
+$key = new CloudflareAPIToken($key);
 $adapter = new CloudflareAdapter($key);
 $zones = new CloudflareZones($adapter);
 $dns = new CloudflareDNS($adapter);
