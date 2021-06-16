@@ -58,34 +58,40 @@ if (empty($email) || empty($key) || empty($zone) || empty($domain)) {
   return;
 }
 
-$key = new CloudflareAPIToken($key);
-$adapter = new CloudflareAdapter($key);
-$zones = new CloudflareZones($adapter);
-$dns = new CloudflareDNS($adapter);
-$zoneID = $zones->getZoneID($zone);
+try {
+  $key = new CloudflareAPIToken($key);
+  $adapter = new CloudflareAdapter($key);
+  $zones = new CloudflareZones($adapter);
+  $dns = new CloudflareDNS($adapter);
+  $zoneID = $zones->getZoneID($zone);
 
-$record = reset($dns->listRecords($zoneID, 'A', $domain)->result);
-$result = updateOrCreate($dns, $zoneID, $record, 'A', $domain, $ipv4, $ttl, $isProxied);
-echo "Updated $domain to $ipv4" . PHP_EOL;
-if(!$result) { print_r($result); }
-
-if ($isWildcard) {
-  $wildcard = reset($dns->listRecords($zoneID, 'A', '*.' . $domain)->result);
-  $result = updateOrCreate($dns, $zoneID, $wildcard, 'A', '*.' . $domain, $ipv4, $ttl, $isProxied);
-  echo "Updated *.$domain to $ipv4";
-  if(!$result) { print_r($result); }
-}
-
-if ($ipv6) {
-  $record = reset($dns->listRecords($zoneID, 'AAAA', $domain)->result);
-  $result = updateOrCreate($dns, $zoneID, $record, 'AAAA', $domain, $ipv6, $ttl, $isProxied);
-  echo "Updated $domain to $ipv6" . PHP_EOL;
+  $record = reset($dns->listRecords($zoneID, 'A', $domain)->result);
+  $result = updateOrCreate($dns, $zoneID, $record, 'A', $domain, $ipv4, $ttl, $isProxied);
+  echo "Updated $domain to $ipv4" . PHP_EOL;
   if(!$result) { print_r($result); }
 
   if ($isWildcard) {
-    $wildcard = reset($dns->listRecords($zoneID, 'AAAA', '*.' . $domain)->result);
-    $result = updateOrCreate($dns, $zoneID, $wildcard, 'AAAA', '*.' . $domain, $ipv6, $ttl, $isProxied);
-    echo "Updated *.$domain to $ipv6";
+    $wildcard = reset($dns->listRecords($zoneID, 'A', '*.' . $domain)->result);
+    $result = updateOrCreate($dns, $zoneID, $wildcard, 'A', '*.' . $domain, $ipv4, $ttl, $isProxied);
+    echo "Updated *.$domain to $ipv4";
     if(!$result) { print_r($result); }
   }
+
+  if ($ipv6) {
+    $record = reset($dns->listRecords($zoneID, 'AAAA', $domain)->result);
+    $result = updateOrCreate($dns, $zoneID, $record, 'AAAA', $domain, $ipv6, $ttl, $isProxied);
+    echo "Updated $domain to $ipv6" . PHP_EOL;
+    if(!$result) { print_r($result); }
+
+    if ($isWildcard) {
+      $wildcard = reset($dns->listRecords($zoneID, 'AAAA', '*.' . $domain)->result);
+      $result = updateOrCreate($dns, $zoneID, $wildcard, 'AAAA', '*.' . $domain, $ipv6, $ttl, $isProxied);
+      echo "Updated *.$domain to $ipv6";
+      if(!$result) { print_r($result); }
+    }
+  }
+} catch(Exception $ex) {
+  echo $ex->GetMessage();
+  http_response_code(400);
+  return;
 }
