@@ -48,8 +48,8 @@ if (empty($email) || empty($key) || empty($zone) || empty($domain)) {
   echo "  -H 'X-Auth-Key: <cloudflare token>\n\n";
   echo "zone = Cloudflare Zone Name (not the ID)\n";
   echo "domain = Domain or Subdomain\n";
-  echo "ip|ipv4 = Update ipv4 (no auto detection)\n";
-  echo "ipv6 = Update ipv6\n";
+  echo "ip|ipv4 = Update ipv4 (no auto detection)" . ($ipv4 ? "[$ipv4]\n" : "\n");
+  echo "ipv6 = Update ipv6" . ($ipv6 ? "[$ipv6]\n" : "\n");
   echo "ttl = Update TTL value (default: 120)\n";
   echo "wildcard = Use *.example.org (flag)\n";
   echo "proxied = Set proxy status (flag)\n\n";
