@@ -1,6 +1,6 @@
 {
     "require": {
-        "symfony/http-foundation": "^5.2",
-        "cloudflare/sdk": "^1.1"
+        "symfony/http-foundation": "^6.2",
+        "cloudflare/sdk": "^1.3"
     }
 }
